@@ -24,6 +24,11 @@ class Tenant extends BaseTenant
         'data' => 'array',
     ];
 
+    public static function getCustomColumns(): array
+    {
+        return ['id', 'subdomain', 'name', 'owner_email', 'status', 'paid_at', 'created_at', 'updated_at'];
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

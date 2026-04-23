@@ -10,8 +10,17 @@ export type User = {
     [key: string]: unknown;
 };
 
+export type SuperAdmin = {
+    id: number;
+    name: string;
+    email: string;
+    created_at: string;
+    updated_at: string;
+};
+
 export type Auth = {
-    user: User;
+    user: User | null;
+    superAdmin: SuperAdmin | null;
 };
 
 export type TwoFactorSetupData = {
