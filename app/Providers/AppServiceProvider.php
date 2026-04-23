@@ -5,6 +5,7 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +25,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->mapAdminRoutes();
+    }
+
+    protected function mapAdminRoutes(): void
+    {
+        Route::domain('admin.'.config('app.domain', 'warehub.test'))
+            ->group(base_path('routes/admin.php'));
     }
 
     /**
