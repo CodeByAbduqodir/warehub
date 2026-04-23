@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+    ArrowRightLeft,
     ArchiveRestore,
     BarChart3,
     ClipboardList,
@@ -45,6 +46,7 @@ const navSections: NavSection[] = [
             { title: 'Склады', href: '/warehouses', icon: Warehouse },
             { title: 'Приход', href: '/incoming', icon: ArchiveRestore },
             { title: 'Продажи', href: '/outgoing', icon: ShoppingCart },
+            { title: 'Перемещения', href: '/transfers', icon: ArrowRightLeft },
             { title: 'Инвентаризация', href: '/inventory', icon: ClipboardList },
         ],
     },
