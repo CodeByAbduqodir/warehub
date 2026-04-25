@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Tenant\ActivityController;
 use App\Http\Controllers\Tenant\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenant\CategoryController;
 use App\Http\Controllers\Tenant\CustomerController;
+use App\Http\Controllers\Tenant\DashboardController;
 use App\Http\Controllers\Tenant\IncomingDocumentController;
 use App\Http\Controllers\Tenant\InventoryDocumentController;
 use App\Http\Controllers\Tenant\OutgoingDocumentController;
 use App\Http\Controllers\Tenant\ProductController;
 use App\Http\Controllers\Tenant\ReportController;
+use App\Http\Controllers\Tenant\StockController;
 use App\Http\Controllers\Tenant\SupplierController;
 use App\Http\Controllers\Tenant\TransferDocumentController;
 use App\Http\Controllers\Tenant\WarehouseController;
 use App\Http\Middleware\EnsureTenant;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -39,7 +41,7 @@ Route::domain('{tenant}.'.config('app.domain', 'warehub.test'))
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('tenant.logout');
 
         Route::middleware(['auth', EnsureTenant::class])->group(function () {
-            Route::get('/', fn () => Inertia::render('tenant/dashboard'))->name('tenant.dashboard');
+            Route::get('/', DashboardController::class)->name('tenant.dashboard');
 
             Route::resource('products', ProductController::class)->names([
                 'index' => 'tenant.products.index',
@@ -61,6 +63,15 @@ Route::domain('{tenant}.'.config('app.domain', 'warehub.test'))
             ]);
 
             Route::post('categories', [CategoryController::class, 'store'])->name('tenant.categories.store');
+
+            Route::resource('stock', StockController::class)->names([
+                'index' => 'tenant.stock.index',
+                'create' => 'tenant.stock.create',
+                'store' => 'tenant.stock.store',
+                'edit' => 'tenant.stock.edit',
+                'update' => 'tenant.stock.update',
+                'destroy' => 'tenant.stock.destroy',
+            ])->except(['show']);
 
             Route::resource('suppliers', SupplierController::class)->names([
                 'index' => 'tenant.suppliers.index',
@@ -111,6 +122,8 @@ Route::domain('{tenant}.'.config('app.domain', 'warehub.test'))
             Route::get('transfers/{transferDocument}', [TransferDocumentController::class, 'show'])->name('tenant.transfers.show');
             Route::post('transfers/{transferDocument}/confirm', [TransferDocumentController::class, 'confirm'])->name('tenant.transfers.confirm');
             Route::delete('transfers/{transferDocument}', [TransferDocumentController::class, 'destroy'])->name('tenant.transfers.destroy');
+
+            Route::get('activity', ActivityController::class)->name('tenant.activity');
 
             // Reports
             Route::get('reports', [ReportController::class, 'index'])->name('tenant.reports.index');

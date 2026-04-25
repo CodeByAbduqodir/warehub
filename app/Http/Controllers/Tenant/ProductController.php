@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\StoreProductRequest;
 use App\Http\Requests\Tenant\UpdateProductRequest;
-use App\Models\Tenant\Category;
 use App\Models\Tenant\Product;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -17,34 +16,36 @@ class ProductController extends Controller
 {
     public function index(): Response
     {
-        $products = Product::with('category')
+        $search = request('search');
+
+        $products = Product::query()
+            ->when($search, fn ($q) => $q->where('name', 'ilike', "%{$search}%"))
             ->latest()
-            ->paginate(25);
+            ->paginate(25)
+            ->withQueryString();
 
         return Inertia::render('tenant/products/index', [
             'products' => $products,
+            'filters' => ['search' => $search],
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('tenant/products/create', [
-            'categories' => Category::orderBy('name')->get(['id', 'name']),
-        ]);
+        return Inertia::render('tenant/products/create');
     }
 
     public function store(StoreProductRequest $request): RedirectResponse
     {
         Product::create($request->validated());
 
-        return redirect('/products')->with('success', 'Товар успешно добавлен');
+        return redirect('/products')->with('success', 'Вид товара добавлен');
     }
 
     public function edit(string $tenant, Product $product): Response
     {
         return Inertia::render('tenant/products/edit', [
-            'product' => $product->load('category'),
-            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'product' => $product,
         ]);
     }
 
@@ -52,13 +53,13 @@ class ProductController extends Controller
     {
         $product->update($request->validated());
 
-        return redirect('/products')->with('success', 'Товар обновлён');
+        return redirect('/products')->with('success', 'Вид товара обновлён');
     }
 
     public function destroy(string $tenant, Product $product): RedirectResponse
     {
         $product->delete();
 
-        return redirect('/products')->with('success', 'Товар удалён');
+        return redirect('/products')->with('success', 'Вид товара удалён');
     }
 }

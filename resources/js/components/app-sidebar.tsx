@@ -3,7 +3,9 @@ import {
     ArrowRightLeft,
     ArchiveRestore,
     BarChart3,
+    Boxes,
     ClipboardList,
+    History,
     LayoutDashboard,
     PackageSearch,
     Settings,
@@ -42,7 +44,8 @@ const navSections: NavSection[] = [
         label: 'Операции',
         items: [
             { title: 'Дашборд', href: dashboard(), icon: LayoutDashboard },
-            { title: 'Товары', href: '/products', icon: PackageSearch },
+            { title: 'Виды товаров', href: '/products', icon: PackageSearch },
+            { title: 'Инвентарь', href: '/stock', icon: Boxes },
             { title: 'Склады', href: '/warehouses', icon: Warehouse },
             { title: 'Приход', href: '/incoming', icon: ArchiveRestore },
             { title: 'Продажи', href: '/outgoing', icon: ShoppingCart },
@@ -56,6 +59,7 @@ const navSections: NavSection[] = [
             { title: 'Поставщики', href: '/suppliers', icon: Truck },
             { title: 'Клиенты', href: '/customers', icon: Users },
             { title: 'Отчёты', href: '/reports', icon: BarChart3 },
+            { title: 'История', href: '/activity', icon: History },
         ],
     },
     {

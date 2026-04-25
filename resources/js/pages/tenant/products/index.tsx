@@ -4,24 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-type Category = {
-    id: number;
-    name: string;
-};
-
 type Product = {
     id: number;
-    sku: string | null;
-    barcode: string | null;
     name: string;
-    brand: string | null;
     unit: string;
-    purchase_price: string;
     retail_price: string;
-    currency: string;
-    min_stock: number;
-    category: Category | null;
-    created_at: string;
+    description: string | null;
 };
 
 type PaginatedProducts = {
@@ -34,10 +22,11 @@ type PaginatedProducts = {
 
 type Props = {
     products: PaginatedProducts;
+    filters: { search: string | null };
 };
 
-export default function ProductsIndex({ products }: Props) {
-    const [search, setSearch] = useState('');
+export default function ProductsIndex({ products, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? '');
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
@@ -45,24 +34,24 @@ export default function ProductsIndex({ products }: Props) {
     }
 
     function handleDelete(product: Product) {
-        if (confirm(`Удалить товар "${product.name}"?`)) {
+        if (confirm(`Удалить вид товара "${product.name}"?`)) {
             router.delete(`/products/${product.id}`);
         }
     }
 
     return (
         <>
-            <Head title="Товары" />
+            <Head title="Виды товаров" />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-lg font-semibold">Товары</h1>
+                        <h1 className="text-lg font-semibold">Виды товаров</h1>
                         <p className="mt-0.5 text-sm text-muted-foreground">{products.total} позиций</p>
                     </div>
                     <Button asChild>
                         <Link href="/products/create">
                             <Plus className="mr-2 size-4" />
-                            Добавить товар
+                            Добавить вид
                         </Link>
                     </Button>
                 </div>
@@ -71,7 +60,7 @@ export default function ProductsIndex({ products }: Props) {
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         <Input
-                            placeholder="Поиск по названию, SKU, штрихкоду..."
+                            placeholder="Поиск по названию..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="pl-9"
@@ -83,9 +72,9 @@ export default function ProductsIndex({ products }: Props) {
                 {products.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center">
                         <PackageSearch className="size-8 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">Товары не найдены</p>
+                        <p className="text-sm text-muted-foreground">Виды товаров не найдены</p>
                         <Button asChild size="sm">
-                            <Link href="/products/create">Добавить первый товар</Link>
+                            <Link href="/products/create">Добавить первый вид</Link>
                         </Button>
                     </div>
                 ) : (
@@ -95,10 +84,8 @@ export default function ProductsIndex({ products }: Props) {
                                 <thead>
                                     <tr className="border-b bg-muted/50">
                                         <th className="px-4 py-3 text-left font-medium text-muted-foreground">Название</th>
-                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">SKU</th>
-                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Категория</th>
-                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Ед.</th>
-                                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Розничная цена</th>
+                                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Ед. изм.</th>
+                                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Стандартная цена</th>
                                         <th className="px-4 py-3 text-right font-medium text-muted-foreground"></th>
                                     </tr>
                                 </thead>
@@ -107,19 +94,15 @@ export default function ProductsIndex({ products }: Props) {
                                         <tr key={product.id} className="border-b last:border-0 hover:bg-muted/30">
                                             <td className="px-4 py-3">
                                                 <div className="font-medium">{product.name}</div>
-                                                {product.brand && (
-                                                    <div className="text-xs text-muted-foreground">{product.brand}</div>
+                                                {product.description && (
+                                                    <div className="max-w-xs truncate text-xs text-muted-foreground">
+                                                        {product.description}
+                                                    </div>
                                                 )}
-                                            </td>
-                                            <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                                                {product.sku ?? '—'}
-                                            </td>
-                                            <td className="px-4 py-3 text-muted-foreground">
-                                                {product.category?.name ?? '—'}
                                             </td>
                                             <td className="px-4 py-3 text-muted-foreground">{product.unit}</td>
                                             <td className="px-4 py-3 text-right tabular-nums">
-                                                {Number(product.retail_price).toLocaleString()} {product.currency}
+                                                {Number(product.retail_price).toLocaleString()} UZS
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center justify-end gap-1">
@@ -179,6 +162,6 @@ export default function ProductsIndex({ products }: Props) {
 ProductsIndex.layout = {
     breadcrumbs: [
         { title: 'Дашборд', href: '/' },
-        { title: 'Товары', href: '/products' },
+        { title: 'Виды товаров', href: '/products' },
     ],
 };
