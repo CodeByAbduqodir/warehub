@@ -10,11 +10,12 @@ import {
     PackageSearch,
     Settings,
     ShoppingCart,
-    Store,
+    Warehouse,
     Truck,
     Users,
-    Warehouse,
+    Hexagon,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -72,42 +73,60 @@ export function AppSidebar() {
     const { isCurrentUrl } = useCurrentUrl();
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-sidebar-border bg-sidebar">
-            <SidebarHeader className="px-4 py-5">
-                <Link href={dashboard()} className="flex items-center gap-2">
-                    <Store className="size-5 text-foreground" />
-                    <span className="text-base font-semibold tracking-tight text-foreground">WareHub</span>
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-sidebar-border">
+            <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
+                <Link href={dashboard()} className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sky-500 shadow-sm">
+                        <Hexagon className="size-4 text-white" strokeWidth={2.5} />
+                    </div>
+                    <div className="flex flex-col leading-none">
+                        <span className="text-[15px] font-bold tracking-tight text-sidebar-primary">WareHub</span>
+                        <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-sidebar-foreground/60">
+                            Управление
+                        </span>
+                    </div>
                 </Link>
             </SidebarHeader>
 
-            <SidebarContent className="px-2">
+            <SidebarContent className="px-2 py-2">
                 {navSections.map((section) => (
                     <SidebarGroup key={section.label} className="py-1">
-                        <SidebarGroupLabel className="px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        <SidebarGroupLabel className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/50">
                             {section.label}
                         </SidebarGroupLabel>
                         <SidebarMenu>
-                            {section.items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={isCurrentUrl(item.href)}
-                                        tooltip={{ children: item.title }}
-                                        className="gap-3 rounded-md px-2 py-2 text-sm"
+                            {section.items.map((item) => {
+                                const active = isCurrentUrl(item.href);
+                                return (
+                                    <SidebarMenuItem
+                                        key={item.title}
+                                        className={cn(active && 'sidebar-active-item')}
                                     >
-                                        <Link href={item.href}>
-                                            <item.icon className="size-4" />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={active}
+                                            tooltip={{ children: item.title }}
+                                            className={cn(
+                                                'gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150',
+                                                active
+                                                    ? 'text-sidebar-accent-foreground'
+                                                    : 'text-sidebar-foreground hover:text-sidebar-primary',
+                                            )}
+                                        >
+                                            <Link href={item.href}>
+                                                <item.icon className="size-[15px] shrink-0" />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                );
+                            })}
                         </SidebarMenu>
                     </SidebarGroup>
                 ))}
             </SidebarContent>
 
-            <SidebarFooter className="px-2 py-3">
+            <SidebarFooter className="border-t border-sidebar-border px-2 py-3">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

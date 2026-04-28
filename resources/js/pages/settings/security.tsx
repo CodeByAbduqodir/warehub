@@ -51,97 +51,71 @@ export default function Security({
 
     return (
         <>
-            <Head title="Security settings" />
+            <Head title="Настройки безопасности" />
 
-            <h1 className="sr-only">Security settings</h1>
+            <h1 className="sr-only">Настройки безопасности</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
+                    title="Изменить пароль"
+                    description="Используйте длинный и уникальный пароль для безопасности"
                 />
 
                 <Form
                     {...SecurityController.update.form()}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    resetOnError={[
-                        'password',
-                        'password_confirmation',
-                        'current_password',
-                    ]}
+                    options={{ preserveScroll: true }}
+                    resetOnError={['password', 'password_confirmation', 'current_password']}
                     resetOnSuccess
-                    onError={(errors) => {
-                        if (errors.password) {
-                            passwordInput.current?.focus();
-                        }
-
-                        if (errors.current_password) {
-                            currentPasswordInput.current?.focus();
-                        }
+                    onError={(errs) => {
+                        if (errs.password) { passwordInput.current?.focus(); }
+                        if (errs.current_password) { currentPasswordInput.current?.focus(); }
                     }}
                     className="space-y-6"
                 >
                     {({ errors, processing }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
-                                </Label>
-
+                                <Label htmlFor="current_password">Текущий пароль</Label>
                                 <PasswordInput
                                     id="current_password"
                                     ref={currentPasswordInput}
                                     name="current_password"
                                     className="mt-1 block w-full"
                                     autoComplete="current-password"
-                                    placeholder="Current password"
+                                    placeholder="••••••••"
                                 />
-
                                 <InputError message={errors.current_password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
-
+                                <Label htmlFor="password">Новый пароль</Label>
                                 <PasswordInput
                                     id="password"
                                     ref={passwordInput}
                                     name="password"
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
-                                    placeholder="New password"
+                                    placeholder="••••••••"
                                 />
-
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-
+                                <Label htmlFor="password_confirmation">Подтвердите пароль</Label>
                                 <PasswordInput
                                     id="password_confirmation"
                                     name="password_confirmation"
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
-                                    placeholder="Confirm password"
+                                    placeholder="••••••••"
                                 />
-
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                <InputError message={errors.password_confirmation} />
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-password-button"
-                                >
-                                    Save password
+                                <Button disabled={processing} data-test="update-password-button">
+                                    Сохранить пароль
                                 </Button>
                             </div>
                         </>
@@ -153,26 +127,21 @@ export default function Security({
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Two-factor authentication"
-                        description="Manage your two-factor authentication settings"
+                        title="Двухфакторная аутентификация"
+                        description="Управление двухфакторной аутентификацией аккаунта"
                     />
                     {twoFactorEnabled ? (
                         <div className="flex flex-col items-start justify-start space-y-4">
                             <p className="text-sm text-muted-foreground">
-                                You will be prompted for a secure, random pin
-                                during login, which you can retrieve from the
-                                TOTP-supported application on your phone.
+                                При входе вам будет предложено ввести одноразовый код из
+                                приложения-аутентификатора на вашем телефоне.
                             </p>
 
                             <div className="relative inline">
                                 <Form {...disable.form()}>
                                     {({ processing }) => (
-                                        <Button
-                                            variant="destructive"
-                                            type="submit"
-                                            disabled={processing}
-                                        >
-                                            Disable 2FA
+                                        <Button variant="destructive" type="submit" disabled={processing}>
+                                            Отключить 2FA
                                         </Button>
                                     )}
                                 </Form>
@@ -187,33 +156,21 @@ export default function Security({
                     ) : (
                         <div className="flex flex-col items-start justify-start space-y-4">
                             <p className="text-sm text-muted-foreground">
-                                When you enable two-factor authentication, you
-                                will be prompted for a secure pin during login.
-                                This pin can be retrieved from a TOTP-supported
-                                application on your phone.
+                                После включения двухфакторной аутентификации при входе
+                                потребуется ввести одноразовый код из TOTP-приложения.
                             </p>
 
                             <div>
                                 {hasSetupData ? (
-                                    <Button
-                                        onClick={() => setShowSetupModal(true)}
-                                    >
+                                    <Button onClick={() => setShowSetupModal(true)}>
                                         <ShieldCheck />
-                                        Continue setup
+                                        Продолжить настройку
                                     </Button>
                                 ) : (
-                                    <Form
-                                        {...enable.form()}
-                                        onSuccess={() =>
-                                            setShowSetupModal(true)
-                                        }
-                                    >
+                                    <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
                                         {({ processing }) => (
-                                            <Button
-                                                type="submit"
-                                                disabled={processing}
-                                            >
-                                                Enable 2FA
+                                            <Button type="submit" disabled={processing}>
+                                                Включить 2FA
                                             </Button>
                                         )}
                                     </Form>
@@ -242,7 +199,7 @@ export default function Security({
 Security.layout = {
     breadcrumbs: [
         {
-            title: 'Security settings',
+            title: 'Настройки безопасности',
             href: edit(),
         },
     ],
