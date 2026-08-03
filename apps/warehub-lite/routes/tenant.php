@@ -87,9 +87,11 @@ Route::middleware([
         Route::redirect('settings', '/');
         Route::redirect('settings/{path}', '/');
 
-        // Reports: index + stock-snapshot + top-selling only.
+        // Reports: stock snapshot, daily income, and top-selling.
         Route::get('reports', [ReportController::class, 'index'])->name('tenant.reports.index');
         Route::get('reports/stock-snapshot', [ReportController::class, 'stockSnapshot'])->name('tenant.reports.stockSnapshot');
+        Route::get('reports/daily-income', [ReportController::class, 'dailyIncome'])->name('tenant.reports.dailyIncome');
+        Route::get('reports/backup-export', [ReportController::class, 'backupExport'])->name('tenant.reports.backupExport');
         Route::get('reports/top-selling', [ReportController::class, 'topSelling'])->name('tenant.reports.topSelling');
         Route::redirect('reports/{report}', '/reports');
     });

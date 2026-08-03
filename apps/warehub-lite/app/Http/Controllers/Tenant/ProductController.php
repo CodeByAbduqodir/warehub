@@ -8,18 +8,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\StoreProductRequest;
 use App\Http\Requests\Tenant\UpdateProductRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Warehub\Core\Models\Tenant\Product;
 
 class ProductController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $search = request('search');
+        $data = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+        ]);
+        $search = $data['search'] ?? null;
 
         $products = Product::query()
-            ->when($search, fn ($q) => $q->where('name', 'ilike', "%{$search}%"))
+            ->when($search, fn ($query) => $query->whereLike('name', "%{$search}%"))
             ->latest()
             ->paginate(25)
             ->withQueryString();

@@ -1,6 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Boxes, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Boxes, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@warehub/ui';
+import { Input } from '@warehub/ui';
 
 type StockItem = {
     id: number;
@@ -19,9 +21,17 @@ type PaginatedStock = {
 
 type Props = {
     stock: PaginatedStock;
+    filters: { search: string | null };
 };
 
-export default function StockIndex({ stock }: Props) {
+export default function StockIndex({ stock, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? '');
+
+    function handleSearch(event: React.FormEvent) {
+        event.preventDefault();
+        router.get('/stock', { search: search || undefined }, { preserveState: true });
+    }
+
     function handleDelete(item: StockItem) {
         if (
             confirm(
@@ -51,11 +61,28 @@ export default function StockIndex({ stock }: Props) {
                     </Button>
                 </div>
 
+                <form onSubmit={handleSearch} className="flex gap-2">
+                    <div className="relative max-w-sm flex-1">
+                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            placeholder="Поиск по товару, SKU или штрихкоду..."
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
+                    <Button type="submit" variant="outline">
+                        Найти
+                    </Button>
+                </form>
+
                 {stock.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center">
                         <Boxes className="size-8 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">
-                            На складах пока нет товаров
+                            {filters.search
+                                ? 'Товары по вашему запросу не найдены'
+                                : 'На складах пока нет товаров'}
                         </p>
                         <Button asChild size="sm">
                             <Link href="/stock/create">
@@ -168,6 +195,9 @@ export default function StockIndex({ stock }: Props) {
                                                 router.get('/stock', {
                                                     page:
                                                         stock.current_page - 1,
+                                                    search:
+                                                        filters.search ||
+                                                        undefined,
                                                 })
                                             }
                                         >
@@ -182,6 +212,9 @@ export default function StockIndex({ stock }: Props) {
                                                 router.get('/stock', {
                                                     page:
                                                         stock.current_page + 1,
+                                                    search:
+                                                        filters.search ||
+                                                        undefined,
                                                 })
                                             }
                                         >

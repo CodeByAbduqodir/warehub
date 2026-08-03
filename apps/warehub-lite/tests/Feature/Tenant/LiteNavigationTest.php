@@ -10,6 +10,8 @@ use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 use Warehub\Core\Models\Central\Tenant;
 use Warehub\Core\Models\Tenant\IncomingDocument;
+use Warehub\Core\Models\Tenant\Product;
+use Warehub\Core\Models\Tenant\Stock;
 use Warehub\Core\Models\Tenant\Warehouse;
 
 class LiteNavigationTest extends TestCase
@@ -90,6 +92,25 @@ class LiteNavigationTest extends TestCase
                 ->component('tenant/dashboard')
                 ->where('recentOperations.0.id', $document->id)
                 ->where('recentOperations.0.number', 'IN-000123')
+            );
+    }
+
+    public function test_dashboard_includes_total_value_of_stock_at_retail_prices(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $product = Product::factory()->create(['retail_price' => 1200]);
+        Stock::create([
+            'product_id' => $product->id,
+            'warehouse_id' => $this->warehouse->id,
+            'quantity' => 3.5,
+        ]);
+        tenancy()->end();
+
+        $this->actingAs($this->user)
+            ->get("http://{$this->tenantDomain}/")
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('tenant/dashboard')
+                ->where('kpi.totalStockValue', 4200)
             );
     }
 }

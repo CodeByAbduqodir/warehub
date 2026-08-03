@@ -6,6 +6,7 @@ namespace Tests\Feature\Tenant;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 use Warehub\Core\Models\Central\Tenant;
 use Warehub\Core\Models\Tenant\Product;
@@ -55,6 +56,24 @@ class ProductTest extends TestCase
             ->get("http://{$this->tenantDomain}/products");
 
         $response->assertOk();
+    }
+
+    public function test_products_search_returns_matching_products_without_a_server_error(): void
+    {
+        tenancy()->initialize($this->tenant);
+        Product::factory()->create(['name' => 'Зелёный чай']);
+        Product::factory()->create(['name' => 'Чёрный кофе']);
+        tenancy()->end();
+
+        $this->actingAs($this->user)
+            ->get("http://{$this->tenantDomain}/products?search=%D1%87%D0%B0%D0%B9")
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('tenant/products/index')
+                ->has('products.data', 1)
+                ->where('products.data.0.name', 'Зелёный чай')
+                ->where('filters.search', 'чай')
+            );
     }
 
     public function test_create_product_page_is_accessible(): void

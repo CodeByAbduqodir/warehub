@@ -5,6 +5,7 @@ import {
     AlertTriangle,
     ArchiveRestore,
     BarChart3,
+    Boxes,
     Package,
     ShoppingCart,
     TrendingUp,
@@ -25,6 +26,7 @@ type User = { id: number; name: string };
 
 type KPI = {
     productCount: number;
+    totalStockValue: number;
     todayRevenue: number;
     todayIncomingCount: number;
     lowStockCount: number;
@@ -71,15 +73,20 @@ function AnimatedNumber({
     value,
     prefix = '',
     suffix = '',
+    maximumFractionDigits = 0,
 }: {
     value: number;
     prefix?: string;
     suffix?: string;
+    maximumFractionDigits?: number;
 }) {
     const spring = useSpring(0, { stiffness: 80, damping: 20 });
     const display = useTransform(
         spring,
-        (v) => `${prefix}${Math.round(v).toLocaleString('ru-RU')}${suffix}`,
+        (v) =>
+            `${prefix}${v.toLocaleString('ru-RU', {
+                maximumFractionDigits,
+            })}${suffix}`,
     );
 
     useEffect(() => {
@@ -100,6 +107,18 @@ const kpiConfig = (kpi: KPI) => [
         iconBg: 'bg-sky-500/10 dark:bg-sky-400/10',
         iconColor: 'text-sky-600 dark:text-sky-400',
         textColor: 'text-sky-600 dark:text-sky-400',
+    },
+    {
+        label: 'Стоимость товаров на складе',
+        value: kpi.totalStockValue,
+        icon: Boxes,
+        href: '/reports/stock-snapshot',
+        suffix: ' сум',
+        gradientFrom: 'from-cyan-500',
+        gradientTo: 'to-sky-500',
+        iconBg: 'bg-cyan-500/10 dark:bg-cyan-400/10',
+        iconColor: 'text-cyan-600 dark:text-cyan-400',
+        textColor: 'text-cyan-600 dark:text-cyan-400',
     },
     {
         label: 'Выручка сегодня',
@@ -202,7 +221,7 @@ export default function TenantDashboard({
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                    className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
                 >
                     {kpiConfig(kpi).map((card) => (
                         <motion.div key={card.label} variants={cardVariant}>
@@ -234,11 +253,11 @@ export default function TenantDashboard({
                                     >
                                         <AnimatedNumber
                                             value={card.value}
-                                            suffix={
-                                                'suffix' in card
-                                                    ? card.suffix
-                                                    : ''
-                                            }
+                                                suffix={
+                                                    'suffix' in card
+                                                        ? card.suffix
+                                                        : ''
+                                                }
                                         />
                                     </p>
                                 </div>

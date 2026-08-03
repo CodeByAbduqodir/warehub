@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\StoreStockRequest;
 use App\Http\Requests\Tenant\UpdateStockRequest;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Warehub\Core\Models\Tenant\Product;
@@ -16,14 +18,33 @@ use Warehub\Core\Models\Tenant\Warehouse;
 
 class StockController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $data = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+        ]);
+        $search = $data['search'] ?? null;
+
         $stock = Stock::with(['product', 'warehouse'])
+            ->when($search, function (Builder $query) use ($search): void {
+                $term = "%{$search}%";
+
+                $query->whereHas('product', function (Builder $productQuery) use ($term): void {
+                    $productQuery->where(function (Builder $productQuery) use ($term): void {
+                        $productQuery
+                            ->whereLike('name', $term)
+                            ->orWhereLike('sku', $term)
+                            ->orWhereLike('barcode', $term);
+                    });
+                });
+            })
             ->orderBy('id', 'desc')
-            ->paginate(25);
+            ->paginate(25)
+            ->withQueryString();
 
         return Inertia::render('tenant/stock/index', [
             'stock' => $stock,
+            'filters' => ['search' => $search],
         ]);
     }
 

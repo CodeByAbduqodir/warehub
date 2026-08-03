@@ -23,6 +23,9 @@ class DashboardController extends Controller
 
         // KPI
         $productCount = Product::count();
+        $totalStockValue = (float) Stock::query()
+            ->join('products', 'products.id', '=', 'stock.product_id')
+            ->sum(DB::raw('stock.quantity * products.retail_price'));
 
         $todayRevenue = OutgoingDocument::where('status', 'confirmed')
             ->whereDate('confirmed_at', $today)
@@ -111,6 +114,7 @@ class DashboardController extends Controller
             'user' => Auth::user(),
             'kpi' => [
                 'productCount' => $productCount,
+                'totalStockValue' => $totalStockValue,
                 'todayRevenue' => (float) $todayRevenue,
                 'todayIncomingCount' => $todayIncomingCount,
                 'lowStockCount' => $lowStockCount,

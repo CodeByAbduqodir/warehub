@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import { Package, Star } from 'lucide-react';
+import { Download, Package, Star, WalletCards } from 'lucide-react';
+import { backupExport, dailyIncome } from '@/routes/tenant/reports';
 
 const REPORTS = [
     {
@@ -7,6 +8,18 @@ const REPORTS = [
         icon: Package,
         title: 'Остатки на складе',
         description: 'Снимок текущих остатков по всем товарам',
+    },
+    {
+        href: dailyIncome(),
+        icon: WalletCards,
+        title: 'Доходы за день',
+        description: 'Выручка по проведённым продажам за выбранную дату',
+    },
+    {
+        href: backupExport(),
+        icon: Download,
+        title: 'Экспорт в Excel',
+        description: 'История продаж и текущие остатки в одном файле',
     },
     {
         href: '/reports/top-selling',
@@ -31,7 +44,7 @@ export default function ReportsIndex() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {REPORTS.map(({ href, icon: Icon, title, description }) => (
                         <Link
-                            key={href}
+                            key={title}
                             href={href}
                             className="group flex flex-col gap-3 rounded-xl border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-card-hover)]"
                         >

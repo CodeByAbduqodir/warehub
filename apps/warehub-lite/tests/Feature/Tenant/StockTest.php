@@ -83,4 +83,32 @@ final class StockTest extends TestCase
         $this->assertSame(0, (int) $stock->reserved);
         tenancy()->end();
     }
+
+    public function test_stock_search_finds_positions_by_product_sku(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $this->product->update(['sku' => 'TEA-001']);
+        $otherProduct = Product::factory()->create(['sku' => 'COFFEE-001']);
+        Stock::create([
+            'product_id' => $this->product->id,
+            'warehouse_id' => $this->warehouse->id,
+            'quantity' => 5,
+        ]);
+        Stock::create([
+            'product_id' => $otherProduct->id,
+            'warehouse_id' => $this->warehouse->id,
+            'quantity' => 3,
+        ]);
+        tenancy()->end();
+
+        $this->actingAs($this->user)
+            ->get("http://{$this->tenantDomain}/stock?search=TEA-001")
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('tenant/stock/index')
+                ->has('stock.data', 1)
+                ->where('stock.data.0.product.id', $this->product->id)
+                ->where('filters.search', 'TEA-001')
+            );
+    }
 }

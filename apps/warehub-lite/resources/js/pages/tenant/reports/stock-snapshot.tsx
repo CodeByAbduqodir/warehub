@@ -1,5 +1,9 @@
 import { Head, router } from '@inertiajs/react';
+import { ChevronDown, CircleAlert, PackageX } from 'lucide-react';
 import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
     Select,
     SelectContent,
     SelectItem,
@@ -8,6 +12,13 @@ import {
 } from '@warehub/ui';
 
 type Warehouse = { id: number; name: string };
+type StockAlert = {
+    id: number;
+    name: string;
+    sku: string;
+    unit: string;
+    available_quantity: string | null;
+};
 type StockItem = {
     id: number;
     quantity: string;
@@ -22,11 +33,19 @@ type StockItem = {
 };
 type Props = {
     items: StockItem[];
+    outOfStock: StockAlert[];
+    lowStock: StockAlert[];
     warehouses: Warehouse[];
     filters: { warehouse_id: number | null };
 };
 
-export default function StockSnapshot({ items, warehouses, filters }: Props) {
+export default function StockSnapshot({
+    items,
+    outOfStock,
+    lowStock,
+    warehouses,
+    filters,
+}: Props) {
     function applyFilter(warehouseId: string) {
         router.get(
             '/reports/stock-snapshot',
@@ -72,6 +91,25 @@ export default function StockSnapshot({ items, warehouses, filters }: Props) {
                             </SelectContent>
                         </Select>
                     </div>
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-2">
+                    <StockAlertPanel
+                        items={outOfStock}
+                        title="Нет в наличии"
+                        description="Товары, у которых остаток закончился"
+                        emptyMessage="Все товары есть в наличии"
+                        icon={PackageX}
+                        tone="danger"
+                    />
+                    <StockAlertPanel
+                        items={lowStock}
+                        title="Мало на складе"
+                        description="Осталось от 1 до 20 единиц"
+                        emptyMessage="Товаров с низким остатком нет"
+                        icon={CircleAlert}
+                        tone="warning"
+                    />
                 </div>
 
                 {items.length === 0 ? (
@@ -150,6 +188,81 @@ export default function StockSnapshot({ items, warehouses, filters }: Props) {
                 )}
             </div>
         </>
+    );
+}
+
+type StockAlertPanelProps = {
+    items: StockAlert[];
+    title: string;
+    description: string;
+    emptyMessage: string;
+    icon: typeof PackageX;
+    tone: 'danger' | 'warning';
+};
+
+function StockAlertPanel({
+    items,
+    title,
+    description,
+    emptyMessage,
+    icon: Icon,
+    tone,
+}: StockAlertPanelProps) {
+    const isDanger = tone === 'danger';
+    const panelClassName = isDanger
+        ? 'border-red-200 bg-red-50/70 dark:border-red-950 dark:bg-red-950/20'
+        : 'border-orange-200 bg-orange-50/70 dark:border-orange-950 dark:bg-orange-950/20';
+    const iconClassName = isDanger
+        ? 'bg-red-100 text-red-600 dark:bg-red-950/70 dark:text-red-300'
+        : 'bg-orange-100 text-orange-700 dark:bg-orange-950/70 dark:text-orange-300';
+    const countClassName = isDanger
+        ? 'bg-red-600 text-white'
+        : 'bg-orange-500 text-white';
+
+    return (
+        <Collapsible defaultOpen={items.length > 0} className={`overflow-hidden rounded-xl border ${panelClassName}`}>
+            <CollapsibleTrigger className="group flex w-full items-center gap-3 px-4 py-4 text-left outline-none transition-colors hover:bg-black/[0.02] focus-visible:ring-2 focus-visible:ring-ring">
+                <span className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${iconClassName}`}>
+                    <Icon className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                    <span className="block font-semibold">{title}</span>
+                    <span className="mt-0.5 block text-sm text-muted-foreground">
+                        {description}
+                    </span>
+                </span>
+                <span className={`rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums ${countClassName}`}>
+                    {items.length}
+                </span>
+                <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="border-t border-black/5">
+                {items.length === 0 ? (
+                    <p className="px-4 py-4 text-sm text-muted-foreground">
+                        {emptyMessage}
+                    </p>
+                ) : (
+                    <ul className="max-h-64 divide-y divide-black/5 overflow-y-auto bg-background/40">
+                        {items.map((item) => (
+                            <li key={item.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                                <span className="min-w-0">
+                                    <span className="block truncate font-medium">{item.name}</span>
+                                    <span className="block font-mono text-xs text-muted-foreground">
+                                        {item.sku}
+                                    </span>
+                                </span>
+                                <span className="shrink-0 text-sm font-semibold tabular-nums">
+                                    {Number(item.available_quantity ?? 0).toLocaleString('ru-RU', {
+                                        maximumFractionDigits: 3,
+                                    })}{' '}
+                                    {item.unit}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </CollapsibleContent>
+        </Collapsible>
     );
 }
 
