@@ -14,7 +14,6 @@ use Warehub\Core\Actions\Tenant\ConfirmOutgoingDocument;
 use Warehub\Core\Models\Tenant\Customer;
 use Warehub\Core\Models\Tenant\OutgoingDocument;
 use Warehub\Core\Models\Tenant\Stock;
-use Warehub\Core\Models\Tenant\Warehouse;
 use Warehub\Core\Support\DocumentNumber;
 
 class OutgoingDocumentController extends Controller
@@ -26,7 +25,7 @@ class OutgoingDocumentController extends Controller
         $document = OutgoingDocument::create([
             'number' => DocumentNumber::temporary(),
             'date' => $data['date'],
-            'warehouse_id' => $data['warehouse_id'],
+            'warehouse_id' => $data['warehouse_id'] ?? null,
             'user_id' => auth()->id(),
             'status' => 'draft',
         ]);
@@ -48,10 +47,7 @@ class OutgoingDocumentController extends Controller
 
     public function pos(): Response
     {
-        $warehouses = Warehouse::orderBy('name')->get(['id', 'name']);
-
         return Inertia::render('tenant/outgoing/pos', [
-            'warehouses' => $warehouses,
             'customers' => Customer::orderBy('name')->get(['id', 'name']),
             'stock' => $this->availableStock(),
         ]);
@@ -62,7 +58,7 @@ class OutgoingDocumentController extends Controller
     {
         return Stock::with('product:id,name,sku,barcode,unit,retail_price,currency')
             ->get()
-            ->groupBy(fn (Stock $stock): string => "{$stock->warehouse_id}:{$stock->product_id}")
+            ->groupBy('product_id')
             ->map(function ($locations) {
                 /** @var Stock $stock */
                 $stock = $locations->first();
@@ -76,7 +72,6 @@ class OutgoingDocumentController extends Controller
                     'retail_price' => $stock->product->retail_price,
                     'currency' => $stock->product->currency,
                     'available' => $locations->sum(fn (Stock $location): float => max(0, $location->available())),
-                    'warehouse_id' => $stock->warehouse_id,
                 ];
             })
             ->values();

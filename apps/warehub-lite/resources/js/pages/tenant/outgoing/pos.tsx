@@ -62,7 +62,6 @@ function CartQtyInput({
 }
 
 type Customer = { id: number; name: string };
-type Warehouse = { id: number; name: string };
 type StockItem = {
     product_id: number;
     product_name: string;
@@ -72,11 +71,9 @@ type StockItem = {
     retail_price: string;
     currency: string;
     available: number;
-    warehouse_id: number;
 };
 type Props = {
     customers?: Customer[];
-    warehouses?: Warehouse[];
     stock?: StockItem[];
 };
 type CartItem = {
@@ -95,14 +92,7 @@ function fmtAmt(n: number): string {
     return n >= 1000 ? `${n / 1000}к` : String(n);
 }
 
-export default function OutgoingPos({
-    customers = [],
-    warehouses = [],
-    stock = [],
-}: Props) {
-    const [warehouseId, setWarehouseId] = useState(
-        warehouses[0] ? String(warehouses[0].id) : '',
-    );
+export default function OutgoingPos({ customers = [], stock = [] }: Props) {
     const [customerId, setCustomerId] = useState('');
     const [cart, setCart] = useState<CartItem[]>([]);
     const [query, setQuery] = useState('');
@@ -113,9 +103,7 @@ export default function OutgoingPos({
     const [error, setError] = useState('');
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const availableStock = stock.filter(
-        (s) => !warehouseId || String(s.warehouse_id) === warehouseId,
-    );
+    const availableStock = stock;
 
     function matchesQuery(s: StockItem) {
         const q = query.toLowerCase();
@@ -265,7 +253,6 @@ export default function OutgoingPos({
             '/outgoing/pos',
             {
                 date: new Date().toISOString().slice(0, 10),
-                warehouse_id: warehouseId,
                 customer_id: customerId || null,
                 items: cart.map((i) => ({
                     product_id: i.product_id,
@@ -316,7 +303,7 @@ export default function OutgoingPos({
 
     useEffect(() => {
         focusSearch();
-    }, [autoAdd, cart, customerId, paymentMethod, warehouseId]);
+    }, [autoAdd, cart, customerId, paymentMethod]);
 
     return (
         <>
@@ -358,29 +345,6 @@ export default function OutgoingPos({
                             <Zap className="size-3.5" />
                             Авто
                         </button>
-                        {warehouses.length > 1 && (
-                            <Select
-                                value={warehouseId}
-                                onValueChange={(v) => {
-                                    setWarehouseId(v);
-                                    setCart([]);
-                                }}
-                            >
-                                <SelectTrigger className="h-9 w-40">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {warehouses.map((w) => (
-                                        <SelectItem
-                                            key={w.id}
-                                            value={String(w.id)}
-                                        >
-                                            {w.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
                     </div>
 
                     <div className="grid flex-1 auto-rows-max grid-cols-2 gap-2 overflow-y-auto p-4 sm:grid-cols-3 lg:grid-cols-4">

@@ -25,7 +25,7 @@ class ConfirmOutgoingDocument
 
             foreach ($lockedDocument->items()->with('product')->get() as $item) {
                 $stocks = Stock::where('product_id', $item->product_id)
-                    ->where('warehouse_id', $lockedDocument->warehouse_id)
+                    ->when($lockedDocument->warehouse_id, fn ($query) => $query->where('warehouse_id', $lockedDocument->warehouse_id))
                     ->when($item->zone_id, fn ($query) => $query->where('zone_id', $item->zone_id))
                     ->orderBy('id')
                     ->lockForUpdate()

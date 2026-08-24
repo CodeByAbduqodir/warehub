@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFo
 import pos28cf7d from './pos'
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 export const pos = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ pos.definition = {
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 pos.url = (options?: RouteQueryOptions) => {
@@ -26,7 +26,7 @@ pos.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 pos.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -36,7 +36,7 @@ pos.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 pos.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -46,7 +46,7 @@ pos.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 const posForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -56,7 +56,7 @@ const posForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 posForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -66,7 +66,7 @@ posForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Tenant\OutgoingDocumentController::pos
-* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:49
+* @see app/Http/Controllers/Tenant/OutgoingDocumentController.php:48
 * @route '/outgoing/pos'
 */
 posForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

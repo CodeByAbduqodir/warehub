@@ -21,7 +21,7 @@ class StoreOutgoingDocumentRequest extends FormRequest
         return [
             'date' => ['required', 'date'],
             'customer_id' => ['nullable', 'integer', TenantRule::exists('customers')],
-            'warehouse_id' => ['required', 'integer', TenantRule::exists('warehouses')],
+            'warehouse_id' => ['nullable', 'integer', TenantRule::exists('warehouses')],
             'note' => ['nullable', 'string', 'max:2000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', TenantRule::exists('products')],
