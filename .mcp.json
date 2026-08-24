@@ -9,7 +9,7 @@
         },
         "obsidian": {
             "type": "http",
-            "url": "https://127.0.0.1:27124/mcp/",
+            "url": "http://127.0.0.1:27123/mcp/",
             "headers": {
                 "Authorization": "Bearer 261769e51082843f3055c35c716e5e623d63b20a7def4010e0ace9bab25855f7"
             }

@@ -16,10 +16,11 @@ const REPORTS = [
         description: 'Выручка по проведённым продажам за выбранную дату',
     },
     {
-        href: backupExport(),
+        href: backupExport().url,
         icon: Download,
         title: 'Экспорт в Excel',
         description: 'История продаж и текущие остатки в одном файле',
+        download: true,
     },
     {
         href: '/reports/top-selling',
@@ -42,23 +43,48 @@ export default function ReportsIndex() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {REPORTS.map(({ href, icon: Icon, title, description }) => (
-                        <Link
-                            key={title}
-                            href={href}
-                            className="group flex flex-col gap-3 rounded-xl border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-card-hover)]"
-                        >
-                            <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)]">
-                                <Icon className="size-4" />
-                            </div>
-                            <div>
-                                <div className="font-medium">{title}</div>
-                                <div className="mt-0.5 text-xs text-muted-foreground">
-                                    {description}
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
+                    {REPORTS.map(
+                        ({ href, icon: Icon, title, description, download }) => {
+                            const cardClassName =
+                                'group flex flex-col gap-3 rounded-xl border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-card-hover)]';
+                            const content = (
+                                <>
+                                    <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground group-hover:bg-[var(--accent-soft)] group-hover:text-[var(--accent)]">
+                                        <Icon className="size-4" />
+                                    </div>
+                                    <div>
+                                        <div className="font-medium">
+                                            {title}
+                                        </div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground">
+                                            {description}
+                                        </div>
+                                    </div>
+                                </>
+                            );
+
+                            // Excel export streams a binary file — a plain
+                            // browser navigation is required so the download
+                            // is handled natively; an Inertia visit can't.
+                            return download ? (
+                                <a
+                                    key={title}
+                                    href={href}
+                                    className={cardClassName}
+                                >
+                                    {content}
+                                </a>
+                            ) : (
+                                <Link
+                                    key={title}
+                                    href={href}
+                                    className={cardClassName}
+                                >
+                                    {content}
+                                </Link>
+                            );
+                        },
+                    )}
                 </div>
             </div>
         </>
